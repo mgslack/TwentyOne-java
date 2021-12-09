@@ -1,0 +1,2 @@
+Class-Path: cards.jar slack.jar spinner.jar
+Main-Class: TwentyOne

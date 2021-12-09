@@ -1,0 +1,72 @@
+<?xml version="1.0" standalone="yes"?>
+
+<project name="TwentyOne" default="dist" basedir=".">
+  <description>TwentyOne Card Game Ant Build Script</description>
+
+  <!-- dependant jar location -->
+  <property name="lib" value="."/>
+
+  <!-- java source (other files for program) location -->
+  <property name="src" value="src"/>
+
+  <!-- location to store compiled classes -->
+  <property name="build" value="build"/>
+
+  <!-- location to build loader distribution jar -->
+  <property name="dist" value="dist"/>
+
+  <!-- name of the distribution jar -->
+  <property name="jarname" value="j21"/>
+
+  <!-- setup the classpath dependancies needed -->
+  <path id="lib.path">
+    <fileset dir="${lib}">
+      <include name="**/*.jar"/>
+      <include name="**/*.zip"/>
+	  <excludesfile name="${jarname}.jar"/>
+    </fileset>
+  </path>
+
+  <!-- include in system environment -->
+  <property environment="env"/>
+
+  <!-- = = = = = = = = = = tasks = = = = = = = = = = -->
+
+  <!-- initialize build / globals -->
+  <target name="init" description="Initialize for all targets">
+    <tstamp>
+      <format property="CUR_YEAR" pattern="yyyy"/>
+    </tstamp>
+  </target>
+
+  <!-- compile the source into the 'build' location -->
+  <target name="compile" description="Compile TwentyOne game sources" depends="init">
+    <mkdir dir="${build}"/>
+    <javac destdir="${build}" srcdir="${src}" classpathref="lib.path" nowarn="true" includeAntRuntime="false"/>
+  </target>
+
+  <!-- create jar, include in other files from source tree also -->
+  <target name="dist" description="Build TwentyOne game distribution (jar)" depends="compile">
+    <mkdir dir="${dist}"/>
+    <jar destfile="${dist}/${jarname}.jar"
+         manifest="${basedir}/manifest.txt"
+         basedir="${build}"/>
+    <zip destfile="${dist}/${jarname}.jar"
+         update="true"
+         includes="**/*.properties,**/*.gif"
+         basedir="${basedir}/${src}"/>
+    <copy file="${dist}/${jarname}.jar" todir="${basedir}" overwrite="true"/>
+  </target>
+
+  <!-- remove build folders created during the build -->
+  <target name="clean" description="Cleanup build environment">
+    <delete dir="${build}"/>
+    <delete dir="${dist}"/>
+  </target>
+
+  <!-- run build, then do cleanup of build artifacts -->
+  <target name="buildclean" description="Build, then clean up">
+    <antcall target="dist"/>
+    <antcall target="clean"/>
+  </target>
+</project>
